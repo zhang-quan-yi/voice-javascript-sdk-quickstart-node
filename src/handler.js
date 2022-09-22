@@ -1,5 +1,7 @@
 const VoiceResponse = require("twilio").twiml.VoiceResponse;
+const MessagingResponse = require("twilio").twiml.MessagingResponse;
 const AccessToken = require("twilio").jwt.AccessToken;
+const twilio = require("twilio");
 const VoiceGrant = AccessToken.VoiceGrant;
 
 const nameGenerator = require("../name_generator");
@@ -33,15 +35,13 @@ exports.voiceResponse = function voiceResponse(requestBody) {
   const toNumberOrClientName = requestBody.To;
   const callerId = config.callerId;
   let twiml = new VoiceResponse();
-
-  // If the request to the /voice endpoint is TO your Twilio Number, 
+  // If the request to the /voice endpoint is TO your Twilio Number,
   // then it is an incoming call towards your Twilio.Device.
-  if (toNumberOrClientName == callerId) {
+  if (false) {
     let dial = twiml.dial();
 
-    // This will connect the caller with your Twilio.Device/client 
+    // This will connect the caller with your Twilio.Device/client
     dial.client(identity);
-
   } else if (requestBody.To) {
     // This is an outgoing call
 
@@ -49,7 +49,7 @@ exports.voiceResponse = function voiceResponse(requestBody) {
     let dial = twiml.dial({ callerId });
 
     // Check if the 'To' parameter is a Phone Number or Client Name
-    // in order to use the appropriate TwiML noun 
+    // in order to use the appropriate TwiML noun
     const attr = isAValidPhoneNumber(toNumberOrClientName)
       ? "number"
       : "client";
@@ -60,6 +60,23 @@ exports.voiceResponse = function voiceResponse(requestBody) {
 
   return twiml.toString();
 };
+
+exports.makeCall = async function makeCall(query) {
+  const to = query.to;
+  const client = twilio(config.accountSid, config.authToken);
+  const call = await client.calls.create({
+    twiml: `
+      <Response>
+        <Message>Ahoy, Ray!</Message>
+      </Response>
+    `,
+    to: "+19378064443",
+    from: "+19378064443",
+  });
+  return call.sid;
+};
+
+exports.recordCall = function recordCall() {};
 
 /**
  * Checks if the given value is valid as phone number
