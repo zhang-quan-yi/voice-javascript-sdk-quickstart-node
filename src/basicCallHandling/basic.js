@@ -1,4 +1,4 @@
-const config = require("../config");
+const config = require("../../config");
 const twilio = require("twilio");
 const client = twilio(config.accountSid, config.authToken);
 const VoiceResponse = twilio.twiml.VoiceResponse;
@@ -194,4 +194,15 @@ exports.gatherUserInput_gather = function (digits) {
     twiml.redirect("/main");
   }
   return twiml.toString();
+};
+
+// 07 Retrieving call logs
+exports.retrievingCallLogs = function () {
+  client.calls.list({ limit: 20 }).then((calls) => {
+    // ...
+  });
+  // list options
+  //   status
+  //   to
+  //   limit
 };
